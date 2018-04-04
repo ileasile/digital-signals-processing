@@ -1,0 +1,6 @@
+report/*.log
+report/*.aux
+report/*.out
+report/*.gz
+__pycache__/**
+.idea/**

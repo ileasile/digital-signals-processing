@@ -1,0 +1,192 @@
+\documentclass[a4paper,14pt]{article}
+\usepackage[colorlinks, linkcolor=blue]{hyperref}
+\usepackage{indentfirst}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage[fleqn]{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{sectsty}
+\usepackage{fancyhdr}
+\usepackage{titling}
+\usepackage{datetime}
+\usepackage{amsthm}
+\usepackage[headheight=15pt]{geometry}
+\usepackage{pstricks}
+\usepackage{color}
+\usepackage[linesnumbered, noline, noend]{algorithm2e}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{verbatim}
+\usepackage{amsfonts}
+\usepackage{epstopdf}
+\usepackage{mathtools}
+
+%opening
+\title{Индивидуальное задание 1\\
+	``Нерекурсивный и рекурсивный фильтр''\\
+	Вариант 7}
+\author{Илья Мурадьян, группа 4.1}
+
+\sectionfont{\normalfont\centering\textbf}
+\geometry{left=2cm}% левое поле
+\geometry{right=1.5cm}% правое поле
+\geometry{top=1cm}% верхнее поле
+\geometry{bottom=2cm}% нижнее поле
+
+\let\oldref\ref
+\renewcommand{\ref}[1]{(\oldref{#1})}
+
+\begin{document}
+	\Large
+	
+	\maketitle
+	
+	Мой вариант предполагал использование следующих данных для фильтра и входного сигнала:
+	\par \vspace{0.3cm}
+	
+	\bgroup
+	\def\arraystretch{1.5}
+	\begin{tabular}{|c|c|c|c|c|c|}
+		\hline
+		$a_1$ & $a_2$ & $a_3$ & $b_0$ & $b_1$ & $b_2$ \\
+		\hline
+		$-\frac{4}{3}$ & $-\frac{7}{12}$ & $-\frac{1}{12}$ & $1$ & $-1$ & $-2$ \\
+		\hline
+	\end{tabular}
+	\egroup
+	\par \vspace{0.3cm}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+		\hline
+		$x_0$ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $x_8$ \\
+		\hline
+		$3$ & $5$ & $-2$ & $-4$ & $4$ & $2$ & $-1$ & $-4$ & $2$ \\
+		\hline
+	\end{tabular}
+
+	\vspace{0.3cm}
+	Рекурсивный фильтр задан следующим соотношением:
+	\begin{equation} \label{eq:recfilt}
+		y_n = a_1 y_{n-1} + a_2 y_{n-2} + a_3 y_{n-3} + b_0 x_n + b_1 x_{n-1} + b_2 x_{n-2}
+	\end{equation}
+	
+	Чтобы найти импульсную характеристику сигнала, положим 
+	\[x_n = \delta_n = \begin{cases}
+	1, & n = 0 \\
+	0, & n \ne 0 \\
+	\end{cases} \]
+	
+	Тогда при $n \ge 3$ получим:
+	\begin{equation} \label{eq:rfilt}
+	h_n = a_1 h_{n-1} + a_2 h_{n-2} + a_3 h_{n-3}.
+	\end{equation}
+	
+	С нашими числовыми данными имеем:
+	\[h_n = -\frac{4}{3} h_{n-1} -\frac{7}{12} h_{n-2} -\frac{1}{12} h_{n-3}\]
+	\[12 h_n + 16 h_{n-1} + 7 h_{n-2} + h_{n-3} = 0\]
+	
+	Для этого разностного уравнения выпишем характеристический многочлен и найдём его корни:
+	\[L(\lambda) = 12 \lambda^3 + 16 \lambda^2 + 7 \lambda + 1\]
+	\[ \lambda_{1, 2} = -\frac{1}{2}, \lambda_{3} = -\frac{1}{3} \]
+	
+	Оба найденных корня по модулю меньше единицы, так что исследуемая БИХ-система устойчива. Решение ищем в виде:
+	\begin{equation} \label{eq:solv}
+		h_n = (C_1 + C_2 n) \left ( -\frac{1}{2} \right )^n + C_3 \left (-\frac{1}{3}\right )^n 
+	\end{equation}
+	
+	Подставляя в уравнение \eqref{eq:rfilt} единичный сигнал при $n = 0, 1, 2$ имеем:
+	\begin{equation}
+	\begin{cases} \label{eq:hsyst}
+	h_0 = b_0\\
+	h_1 = a_1 h_0 + b_1 = a_1 b_0 + b_1\\
+	h_2 = a_1 h_1 + a_2 h_0 + b_2 = a_1^2 b_0 + a_1 b_1 + a_2 b_0 + b_2
+	\end{cases}
+	\end{equation}
+	
+	Подставим теперь в левую часть системы \eqref{eq:hsyst} общий вид решения \eqref{eq:solv}, а в правую часть -- исходные данные, и получим следующую линейную систему относительно $C_1, C_2, C_3$:
+	\begin{equation}
+		\begin{pmatrix}
+		1 & 0 & 1 \\
+		-\frac{1}{2} & -\frac{1}{2} & -\frac{1}{3}\\
+		\frac{1}{2} & \frac{1}{2} & \frac{1}{9}\\
+		\end{pmatrix}
+		\begin{pmatrix}
+		C_1 \\
+		C_2 \\
+		C_3 \\
+		\end{pmatrix}
+		=
+		\begin{pmatrix}
+		1 \\
+		-\frac{7}{3}\\
+		\frac{19}{36}\\
+		\end{pmatrix}
+	\end{equation}
+	
+	Решая эту систему, получаем:
+	\begin{equation}
+	C_1 = 57, C_2 = -15, C_3 = -56.
+	\end{equation}
+	
+	Подставим теперь найденные значения констант в \eqref{eq:solv} и получим окончательную формулу для импульсной характеристики:
+	\begin{equation}
+	h_n = (57 - 15 n) \left ( -\frac{1}{2} \right )^n -56 \left (-\frac{1}{3}\right )^n 
+	\end{equation}
+	
+	По полученной формуле вычислим $h_5$:
+	\[h_5 \approx 0.79295267489712\]
+	
+	Такое же значение получается при применении фильтра, что заставляет нас думать, что формула была найдена верно.
+	
+	Рассмотрим теперь следущие два финитных сигнала:
+	\begin{equation}
+		\widetilde{x}_n = \begin{cases}
+		x_n, & 0 \le n \le 8 \\
+		0, & \textup{иначе} \\
+		\end{cases}
+	\end{equation}
+	\begin{equation}
+		\widehat{x}_n = \begin{cases}
+		x_n + \frac{1}{10}, & 0 \le n \le 8 \\
+		\frac{1}{10}, & n \in \{ -1, 9 \} \\
+		0, & \textup{иначе} \\
+		\end{cases}
+	\end{equation}
+	
+	Найдём тысячный отсчет отклика системы на каждый из этих сигналов:
+	\[ \widetilde{y}_{1000} \approx -1,352278 \cdot 10^{-294}. \]
+	\[ \widehat{y}_{1000} \approx -1,305085 \cdot 10^{-294}. \]
+	
+	Как видно, порядки и первые две значащие цифры полученных результатов совпадают. Это говорит о хорошей устойчивости системы.
+	
+	Теперь найдём несколько значений импульсной характеристики: \newline
+	\vspace{0.3cm}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+		\hline
+		$h_0$ & $h_1$ & $h_2$ & $h_3$ & $h_4$ & $h_5$ & $h_6$ & $h_7$ & $h_8$ & $h_9$ \\
+		\hline
+		$1,000$ & $-2,333$ & $0,527$ & $0,574$ & $-0,879$ & $0,793$ & $-0,592$ & $0,401$ & $-0,255$ & $0,155$ \\
+		\hline
+	\end{tabular}
+	
+	\vspace{0.3cm}
+	Построим следущий фильтр с конечной импульсной характеристикой: 
+	\begin{equation*}
+	\begin{array}{l}
+	y_n^{'} = \sum\limits_{k \in \mathbb{Z}} x_k \widehat{h}_{n - k},  \\
+	\textup{где} \quad \widehat{h}_{i} = \begin{cases}
+	h_i, & 0 \le i \le 9 \\
+	0, & \textup{иначе} \\
+	\end{cases} \\
+	\end{array}
+	\end{equation*}
+	
+	Посчитаем теперь 1000-й отсчёт отклика построенного фильтра на сигнал $ \widetilde{x} $:
+	\[ \widetilde{y}_{1000}^{'} = 0.\]
+	
+	Начиная с некоторого $n$ все отсчёты отклика построенного фильтра на заданный финитный сигнал будут нулевыми. Так получилось и сейчас. Однако с учётом того, что тысячный отсчёт фильтра \eqref{eq:recfilt} ничтожно мал, можно назвать это приближение удовлетворительным.
+	
+	Работа была выполнена мною лично, без чьей-либо помощи, без использования нелицензионных программ.
+\end{document}
